@@ -16,7 +16,7 @@ from skimage.io import imsave
 import warnings
 from tqdm import tqdm
 from torch.optim.lr_scheduler import MultiStepLR
-from .utils.common_utils import *
+from utils.common_utils import *
 from SSIM import SSIM
 
 parser = argparse.ArgumentParser()
@@ -24,7 +24,7 @@ parser.add_argument("--preprocess", type=bool, default=False, help='run prepare_
 parser.add_argument('--num_iter', type=int, default=2, help='number of epochs of training')
 parser.add_argument('--img_size', type=int, default=[256, 256], help='size of each image dimension')
 parser.add_argument('--kernel_size', type=int, default=[21, 21], help='size of blur kernel [height, width]')
-parser.add_argument('--data_path', type=str, default="imgs/lai/uniform_ycbcr/", help='path to blurry image')
+parser.add_argument('--data_path', type=str, default="datasets/lai/uniform_ycbcr/", help='path to blurry image')
 parser.add_argument('--save_path', type=str, default="results/lai/uniform_reproduce/", help='path to save results')
 parser.add_argument('--save_frequency', type=int, default=1, help='lfrequency to save results')
 opt = parser.parse_args()
