@@ -83,7 +83,7 @@ for f in files_source:
                 num_channels_up   = [128, 128, 128, 128, 128],
                 num_channels_skip = [16, 16, 16, 16, 16],
                 upsample_mode='bilinear',
-                need_sigmoid=True, need_bias=True, pad=pad, act_fun='LeakyReLU')
+                need_sigmoid=True, need_bias=True, pad=pad, act_fun='LeakyReLU') # 这一步返回的是模型
 
     net = net.type(dtype)
 
@@ -119,7 +119,7 @@ for f in files_source:
         optimizer.zero_grad()
 
         # get the network output
-        out_x = net(net_input)
+        out_x = net(net_input) # 这一步输入的参数是模型的参数，而不是skip的参数(但模型的输入参数是什么？？什么意义？？？参考DIP网络：输入是一个噪声图像或待优化的图像，输出是一个经过优化的图像。)
         out_k = net_kernel(net_input_kernel)
     
         out_k_m = out_k.view(-1,1,opt.kernel_size[0],opt.kernel_size[1])

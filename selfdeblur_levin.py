@@ -140,6 +140,7 @@ for f in files_source:
     '''
     input_depth = 8
     net_input = get_noise(input_depth, INPUT, (opt.img_size[0], opt.img_size[1])).type(dtype)
+    
     net = network()  # TODO: 输入用什么比较好呢？本来的输入是什么作用？
     net = net.type(dtype)  # 什么作用？
 
@@ -177,11 +178,10 @@ for f in files_source:
         optimizer.zero_grad()
 
         # get the network output
-        out_x = net(net_input)
+        out_x = net(net_input) # 这一步应该是不变的，但要看网络的输出能否对应上
         out_k = net_kernel(net_input_kernel)
 
         out_k_m = out_k.view(-1, 1, opt.kernel_size[0], opt.kernel_size[1])
-        # print(out_k_m)
         out_y = nn.functional.conv2d(out_x, out_k_m, padding=0, bias=None)
 
         '''

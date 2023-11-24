@@ -9,8 +9,7 @@ from .non_local_dot_product import NONLocalBlock2D
 
 
 
-def skip(
-        num_input_channels=2, num_output_channels=3, 
+def skip(num_input_channels=2, num_output_channels=3, 
         num_channels_down=[16, 32, 64, 128, 128], num_channels_up=[16, 32, 64, 128, 128], num_channels_skip=[4, 4, 4, 4, 4], 
         filter_size_down=3, filter_size_up=3, filter_skip_size=1,
         need_sigmoid=True, need_bias=True, 
@@ -55,14 +54,14 @@ def skip(
         skip = nn.Sequential()
 
         if num_channels_skip[i] != 0:
-            model_tmp.add(Concat(1, skip, deeper))
+            model_tmp.add(Concat(1, skip, deeper)) # 当跳跃连接通道数非零时，模型为一个跳跃连接+深度神经网络的结构
         else:
             model_tmp.add(deeper)
         
-        model_tmp.add(bn(num_channels_skip[i] + (num_channels_up[i + 1] if i < last_scale else num_channels_down[i])))
+        model_tmp.add(bn(num_channels_skip[i] + (num_channels_up[i + 1] if i < last_scale else num_channels_down[i]))) # 加上一个正则化层
 
         if num_channels_skip[i] != 0:
-            skip.add(conv(input_depth, num_channels_skip[i], filter_skip_size, bias=need_bias, pad=pad))
+            skip.add(conv(input_depth, num_channels_skip[i], filter_skip_size, bias=need_bias, pad=pad)) # skip加上一个卷积层
             skip.add(bn(num_channels_skip[i]))
             skip.add(act(act_fun))
             
