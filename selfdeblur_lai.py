@@ -63,7 +63,7 @@ for f in files_source:
         opt.kernel_size = [75, 75]
 
     _, imgs = get_image(path_to_image, -1) # load image and convert to np.
-    y = np_to_torch(imgs).type(dtype)
+    y = np_to_torch(imgs).type(dtype) # 1x1x680x1024, 4dim
 
     img_size = imgs.shape
     print(imgname)
@@ -76,7 +76,7 @@ for f in files_source:
     '''
     input_depth = 8
 
-    net_input = get_noise(input_depth, INPUT, (opt.img_size[0], opt.img_size[1])).type(dtype)
+    net_input = get_noise(input_depth, INPUT, (opt.img_size[0], opt.img_size[1])).type(dtype) # 1x8x710x1054=1 x input_depth x spatial_size[0] x spatial_size[1]
 
     net = skip( input_depth, 1,
                 num_channels_down = [128, 128, 128, 128, 128],
@@ -90,7 +90,7 @@ for f in files_source:
     
     n_k = 200
     net_input_kernel = get_noise(n_k, INPUT, (1, 1)).type(dtype)
-    net_input_kernel.squeeze_()
+    net_input_kernel.squeeze_() # 200, 1dim
 
     net_kernel = fcn(n_k, opt.kernel_size[0]*opt.kernel_size[1])
     net_kernel = net_kernel.type(dtype)
@@ -104,27 +104,36 @@ for f in files_source:
     scheduler = MultiStepLR(optimizer, milestones=[2000, 3000, 4000], gamma=0.5)  # learning rates
 
     #
-    net_input_saved = net_input.detach().clone()
-    net_input_kernel_saved = net_input_kernel.detach().clone()
+    net_input_saved = net_input.detach().clone() # 1x8x710x1054, 4dim
+    net_input_kernel_saved = net_input_kernel.detach().clone() # 这行是不是没用
 
     ### start SelfDeblur
     for step in tqdm(range(num_iter)):
 
         # input regularization
-        net_input = net_input_saved + reg_noise_std*torch.zeros(net_input_saved.shape).type_as(net_input_saved.data).normal_()
+        net_input = net_input_saved + reg_noise_std*torch.zeros(net_input_saved.shape).type_as(net_input_saved.data).normal_() # 1x8x710x1054, 4dim
         # net_input_kernel = net_input_kernel_saved + reg_noise_std*torch.zeros(net_input_kernel_saved.shape).type_as(net_input_kernel_saved.data).normal_()
-
+        '''
+        .normal_()对全零张量进行正态分布采样，生成具有随机噪声的张量。
+        reg_noise_std是一个标量，表示噪声的标准差。
+        reg_noise_std*torch.zeros(net_input_saved.shape).type_as(net_input_saved.data).normal_()生成了一个具有随机噪声的张量，其形状与net_input_saved相同，并且噪声服从均值为0、标准差为reg_noise_std的正态分布。
+        因此，最终的net_input是原始输入net_input_saved与具有随机噪声的张量相加而得，其形状与net_input_saved相同。  
+        '''
         # change the learning rate
         scheduler.step(step)
         optimizer.zero_grad()
 
         # get the network output
-        out_x = net(net_input) # 这一步输入的参数是模型的参数，而不是skip的参数(但模型的输入参数是什么？？什么意义？？？参考DIP网络：输入是一个噪声图像或待优化的图像，输出是一个经过优化的图像。)
+        out_x = net(net_input) # 这一步输入的参数是模型的参数，而不是skip的参数(参考DIP网络：输入是一个噪声图像或待优化的图像，输出是一个经过优化的图像。)
         out_k = net_kernel(net_input_kernel)
+
+        print(out_x) # 1x1x710X1054, 4dim
+        print(out_x.shape) # 961, 1dim
     
-        out_k_m = out_k.view(-1,1,opt.kernel_size[0],opt.kernel_size[1])
-        # print(out_k_m)
-        out_y = nn.functional.conv2d(out_x, out_k_m, padding=0, bias=None)
+        out_k_m = out_k.view(-1,1,opt.kernel_size[0],opt.kernel_size[1]) # 1x1x31x31, 4dim
+        out_y = nn.functional.conv2d(out_x, out_k_m, padding=0, bias=None) # 1x1x680x1024, 4dim
+        # out_height = floor((height + 2 * padding[0] - dilation[0] * (kernel_size[0] - 1) - 1) / stride[0] + 1)
+        # out_width = floor((width + 2 * padding[1] - dilation[1] * (kernel_size[1] - 1) - 1) / stride[1] + 1)
 
         if step < 500:
             total_loss = mse(out_y, y)

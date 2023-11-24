@@ -51,19 +51,19 @@ mse = torch.nn.MSELoss().type(dtype)
 ssim = SSIM().type(dtype)
 
 # loss函数由mse+lambda*TV改成mse+l_res+l_cons
-def criterion(output, target, net_input_image, step, residual_on=False): # TODO: 这里的net_input_image应该是一张图像，但后面实际输入的net_input恐怕并不是图
+def criterion(output, target, net_input_image, step, residual_on=False): # TODO: 这里的net_input_image应该是一张带噪图像 B C H W，但后面实际输入的net_input并不是图（input_depth!=num of channels），所以输入应该不是net_input
     loss_mse = mse(output, target)
     loss_ssim = 1-ssim(output, target)
     blurry1, blurry2 = pair_downsampler(net_input_image)
 
     if residual_on:
-        pred1 = blurry1-net(blurry1)  # 直接学图片，先不学残差
+        pred1 = blurry1-net(blurry1)
         pred2 = blurry2-net(blurry2)
     else:
-        pred1 = net(blurry1)
-        pred2 = net(blurry2)
+        pred1 = net(blurry1) # 直接学图片，先不学残差 
+        pred2 = net(blurry2) # TODO: 但是net输入的大小应该是net_input的大小，这里降采样结果blurry1的大小不符合了，所以要修改CNN网络结构使其同时能接受这两种尺寸的输入
 
-    loss_res = 1/2*(mse(blurry1, pred2)+mse(blurry2, pred1))
+    loss_res = 1/2*(mse(blurry1, pred2)+mse(blurry2, pred1)) # TODO：这里还要求CNN的输入与输出大小相同(不可实现，看看能不能做其他维度处理)
 
     if residual_on:
         blurry_deblurred = net_input_image - net(net_input_image)
@@ -110,7 +110,7 @@ for f in files_source:
         opt.kernel_size = [21, 21]
 
     _, imgs = get_image(path_to_image, -1)  # load image and convert to np.
-    y = np_to_torch(imgs).type(dtype)
+    y = np_to_torch(imgs).type(dtype) # imgs为图像，(1, 680, 1024)
 
     img_size = imgs.shape
     print(imgname)
@@ -141,8 +141,8 @@ for f in files_source:
     input_depth = 8
     net_input = get_noise(input_depth, INPUT, (opt.img_size[0], opt.img_size[1])).type(dtype)
     
-    net = network()  # TODO: 输入用什么比较好呢？本来的输入是什么作用？
-    net = net.type(dtype)  # 什么作用？
+    net = network(input_depth)  # 在cnn定义中，此处n_chan=input_depth，即输入的net_input的第二维的大小
+    net = net.type(dtype)  # 将net模型对象的数据类型转换为dtype所指定的数据类型，确保模型的输入和输出张量的数据类型与dtype一致。
 
     '''
     k_net:
@@ -163,7 +163,7 @@ for f in files_source:
 
     # initilization inputs
     net_input_saved = net_input.detach().clone()
-    net_input_kernel_saved = net_input_kernel.detach().clone() # TODO:后面怎么没有用到这个
+    net_input_kernel_saved = net_input_kernel.detach().clone() # 没用
 
     # start SelfDeblur
     for step in tqdm(range(num_iter)):
@@ -178,7 +178,7 @@ for f in files_source:
         optimizer.zero_grad()
 
         # get the network output
-        out_x = net(net_input) # 这一步应该是不变的，但要看网络的输出能否对应上
+        out_x = net(net_input) # 输入和输出大小不变，网络要满足这个要求
         out_k = net_kernel(net_input_kernel)
 
         out_k_m = out_k.view(-1, 1, opt.kernel_size[0], opt.kernel_size[1])
@@ -190,7 +190,7 @@ for f in files_source:
         else:
             total_loss = 1-ssim(out_y, y)
         '''
-        total_loss = criterion(out_y, y, net_input, step) # TODO：就是这里的net_input输入，不太对，net_input到底是什么要看get_noise()函数
+        total_loss = criterion(out_y, y, net_input, step) # TODO: 这里第三个输入不应该是net_input
 
         total_loss.backward()
         optimizer.step()
