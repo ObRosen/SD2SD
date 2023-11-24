@@ -15,7 +15,7 @@ from skimage.io import imsave
 import warnings
 from tqdm import tqdm
 from torch.optim.lr_scheduler import MultiStepLR
-from .utils.common_utils import *
+from utils.common_utils import *
 from SSIM import SSIM
 
 parser = argparse.ArgumentParser()

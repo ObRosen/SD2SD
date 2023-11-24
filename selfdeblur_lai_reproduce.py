@@ -137,7 +137,7 @@ for f in files_source:
             out_x_np = torch_to_np(out_x)
             out_x_np = out_x_np.squeeze()
             out_x_np = out_x_np[padh//2:padh//2+img_size[1], padw//2:padw//2+img_size[2]]
-            #out_x_np = np.uint8(out_x_np*255)
+            out_x_np = np.uint8(out_x_np*255)
             #cv2.imwrite(save_path, out_x_np)
             imsave(save_path, out_x_np)
 
@@ -145,6 +145,7 @@ for f in files_source:
             out_k_np = torch_to_np(out_k_m)
             out_k_np = out_k_np.squeeze()
             out_k_np /= np.max(out_k_np)
+            out_k_np = np.uint8(out_k_np*255)
             imsave(save_path, out_k_np)
 
             #torch.save(net, os.path.join(opt.save_path, "%s_xnet.pth" % imgname))

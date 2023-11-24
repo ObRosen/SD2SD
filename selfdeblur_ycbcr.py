@@ -17,7 +17,7 @@ from PIL import Image
 import warnings
 from tqdm import tqdm
 from torch.optim.lr_scheduler import MultiStepLR
-from .utils.common_utils import *
+from utils.common_utils import *
 from SSIM import SSIM
 
 parser = argparse.ArgumentParser()
@@ -156,6 +156,7 @@ for f in files_source:
             out_k_np = torch_to_np(out_k_m)
             out_k_np = out_k_np.squeeze()
             out_k_np /= np.max(out_k_np)
+            out_k_np = np.uint8(out_k_np*255)
             imsave(save_path, out_k_np)
 
             torch.save(net, os.path.join(opt.save_path, "%s_xnet.pth" % imgname))

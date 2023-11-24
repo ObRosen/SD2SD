@@ -16,7 +16,7 @@ from skimage.io import imsave
 import warnings
 from tqdm import tqdm
 from torch.optim.lr_scheduler import MultiStepLR
-from .utils.common_utils import *
+from utils.common_utils import *
 from SSIM import SSIM
 
 parser = argparse.ArgumentParser()
@@ -24,7 +24,7 @@ parser.add_argument("--preprocess", type=bool, default=False, help='run prepare_
 parser.add_argument('--num_iter', type=int, default=2, help='number of epochs of training')
 parser.add_argument('--img_size', type=int, default=[256, 256], help='size of each image dimension')
 parser.add_argument('--kernel_size', type=int, default=[21, 21], help='size of blur kernel [height, width]')
-parser.add_argument('--data_path', type=str, default="imgs/levin/", help='path to blurry image')
+parser.add_argument('--data_path', type=str, default="datasets/levin/", help='path to blurry image')
 parser.add_argument('--save_path', type=str, default="results/levin_reproduce/", help='path to save results')
 parser.add_argument('--save_frequency', type=int, default=1, help='frequency to save results')
 opt = parser.parse_args()
@@ -145,7 +145,7 @@ for f in files_source:
             out_x_np = torch_to_np(out_x)
             out_x_np = out_x_np.squeeze()
             out_x_np = out_x_np[padh//2:padh//2+img_size[1], padw//2:padw//2+img_size[2]]
-            #out_x_np = np.uint8(out_x_np*255)
+            out_x_np = np.uint8(out_x_np*255)
             #cv2.imwrite(save_path, out_x_np)
             imsave(save_path, out_x_np)
 
@@ -153,6 +153,7 @@ for f in files_source:
             out_k_np = torch_to_np(out_k_m)
             out_k_np = out_k_np.squeeze()
             out_k_np /= np.max(out_k_np)
+            out_k_np = np.uint8(out_k_np*255)
             imsave(save_path, out_k_np)
 
             #torch.save(net, os.path.join(opt.save_path, "%s_xnet.pth" % imgname))
