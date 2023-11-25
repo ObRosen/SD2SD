@@ -24,7 +24,7 @@ parser.add_argument('--num_iter', type=int, default=5000, help='number of epochs
 parser.add_argument('--img_size', type=int, default=[256, 256], help='size of each image dimension')
 parser.add_argument('--kernel_size', type=int, default=[21, 21], help='size of blur kernel [height, width]')
 parser.add_argument('--data_path', type=str, default="datasets/lai/uniform_ycbcr/", help='path to blurry image')
-parser.add_argument('--save_path', type=str, default="results/lai/uniform", help='path to save results')
+parser.add_argument('--save_path', type=str, default="results/lai/uniform_test_2", help='path to save results')
 parser.add_argument('--save_frequency', type=int, default=100, help='lfrequency to save results')
 opt = parser.parse_args()
 #print(opt)
@@ -126,9 +126,6 @@ for f in files_source:
         # get the network output
         out_x = net(net_input) # 这一步输入的参数是模型的参数，而不是skip的参数(参考DIP网络：输入是一个噪声图像或待优化的图像，输出是一个经过优化的图像。)
         out_k = net_kernel(net_input_kernel)
-
-        print(out_x) # 1x1x710X1054, 4dim
-        print(out_x.shape) # 961, 1dim
     
         out_k_m = out_k.view(-1,1,opt.kernel_size[0],opt.kernel_size[1]) # 1x1x31x31, 4dim
         out_y = nn.functional.conv2d(out_x, out_k_m, padding=0, bias=None) # 1x1x680x1024, 4dim

@@ -98,7 +98,7 @@ def load(path):
     return img
 
 def get_image(path, imsize=-1):
-    """Load an image and resize to a cpecific size. 
+    """Load an image and resize to a specific size. 
 
     Args: 
         path: path to image
