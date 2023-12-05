@@ -1,0 +1,17 @@
+num_channels_down: [128, 128, 128, 128, 128], num_channels_skip: [16, 16, 16, 16, 16], time cost: 175.59766459465027
+num_channels_down: [128, 128, 128, 128, 128], num_channels_skip: [16, 16, 16, 16, 8], time cost: 177.1764693260193
+num_channels_down: [128, 128, 128, 128, 128], num_channels_skip: [16, 16, 16, 8, 8], time cost: 174.99650692939758
+num_channels_down: [128, 128, 128, 128, 64], num_channels_skip: [16, 16, 16, 16, 16], time cost: 164.34097719192505
+num_channels_down: [128, 128, 128, 128, 64], num_channels_skip: [16, 16, 16, 16, 8], time cost: 167.15540480613708
+num_channels_down: [128, 128, 128, 128, 64], num_channels_skip: [16, 16, 16, 8, 8], time cost: 166.95372414588928
+num_channels_down: [128, 128, 128, 64, 64], num_channels_skip: [16, 16, 16, 16, 16], time cost: 165.5988302230835
+num_channels_down: [128, 128, 128, 64, 64], num_channels_skip: [16, 16, 16, 16, 8], time cost: 165.42480754852295
+num_channels_down: [128, 128, 128, 64, 64], num_channels_skip: [16, 16, 16, 8, 8], time cost: 164.6502137184143
+num_channels_down: [128, 128, 64, 64, 64], num_channels_skip: [16, 16, 16, 16, 16], time cost: 164.30026841163635
+num_channels_down: [128, 128, 64, 64, 64], num_channels_skip: [16, 16, 16, 16, 8], time cost: 165.66679072380066
+num_channels_down: [128, 128, 64, 64, 64], num_channels_skip: [16, 16, 16, 8, 8], time cost: 160.5891149044037
+num_channels_down: [128, 64, 64, 64, 64], num_channels_skip: [16, 16, 16, 16, 16], time cost: 159.8147168159485
+num_channels_down: [128, 64, 64, 64, 64], num_channels_skip: [16, 16, 16, 16, 8], time cost: 159.73379516601562
+num_channels_down: [128, 64, 64, 64, 64], num_channels_skip: [16, 16, 16, 8, 8], time cost: 153.1963348388672
+num_channels_down: [64, 64, 64, 64, 64], num_channels_skip: [16, 16, 16, 16, 16], time cost: 153.42597579956055
+num_channels_down: [64, 64, 64, 64, 64], num_channels_skip: [16, 16, 16, 16, 8], time cost: 154.18909120559692

@@ -1,0 +1,1 @@
+num_channels_down: [128, 128, 128, 128, 128], num_channels_skip: [16, 16, 16, 16, 16], time cost: 175.14429306983948, last_loss: 0.0014219284057617188
