@@ -18,6 +18,7 @@ from tqdm import tqdm
 from torch.optim.lr_scheduler import MultiStepLR
 from utils.common_utils import *
 from SSIM import SSIM
+import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--num_iter', type=int, default=5000,
@@ -29,7 +30,7 @@ parser.add_argument('--kernel_size', type=int,
 parser.add_argument('--data_path', type=str,
                     default="datasets/levin/", help='path to blurry image')
 parser.add_argument('--save_path', type=str,
-                    default="results/levin_cnn/", help='path to save results')
+                    default="results/levin_cnn_originloss/", help='path to save results')
 parser.add_argument('--save_frequency', type=int,
                     default=100, help='lfrequency to save results')
 opt = parser.parse_args()
@@ -117,10 +118,11 @@ def draw_loss(loss,step):
     plt.ylabel('Loss')
     plt.title('Loss vs Epoch')
     plt.grid(True)
-    plt.savefig('loss.png',dpi=600)
+    plt.savefig('loss_cnn.png',dpi=600)
 
 # start #image
 for f in files_source:
+    time1=time.time()
     INPUT = 'noise'
     pad = 'reflection'
     LR = 0.01
@@ -203,13 +205,13 @@ for f in files_source:
         out_k_m = out_k.view(-1, 1, opt.kernel_size[0], opt.kernel_size[1]) # torch.Size([1, 1, 17, 17])
         out_y = nn.functional.conv2d(out_x, out_k_m, padding=0, bias=None)  # 这一行决定out_X的第二维=1 # torch.Size([1, 1, 255, 255])
 
-        '''
+        
         if step < 1000:
             total_loss = mse(out_y, y)
         else:
             total_loss = 1-ssim(out_y, y)
-        '''
-        total_loss = criterion(out_y, y, net_input, net_input_kernel, step)
+
+        # total_loss = criterion(out_y, y, net_input, net_input_kernel, step)
         losses.append(total_loss.item())
         total_loss.backward()
         optimizer.step()
@@ -237,6 +239,7 @@ for f in files_source:
                 opt.save_path, "%s_xnet.pth" % imgname))
             torch.save(net_kernel, os.path.join(
                 opt.save_path, "%s_knet.pth" % imgname))
-    
+    time2=time.time()
+    print(f'训练5000代耗时{time2-time1}s')
     draw_loss(losses, num_iter)
     break

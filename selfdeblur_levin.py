@@ -42,7 +42,7 @@ os.makedirs(save_path, exist_ok=True)
 def draw_loss(loss,step):
     epoch=np.arange(step)
     loss=np.array(loss)
-    plt.plot(epoch, loss, marker='o')
+    plt.plot(epoch, loss)
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.title('Loss vs Epoch')
